@@ -1,0 +1,32 @@
+.nav-bar {
+    background: #35858b;
+    border-bottom: 1px solid #e5e5e5;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 10px;
+}
+
+.nav-ele-l{
+    display: inline-block;
+}
+
+.nav-ele-r{
+    display: inline-block;
+    float: right;
+}
+
+.main-content {
+    background: #aefeff;
+    padding: 10px;
+}
+
+.bottom-bar {
+    background: #35858b;
+    border-top: 1px solid #e5e5e5;
+    padding: 10px;
+}
+
+.bottom-bar-ele {
+    display: inline-block;
+    padding: 0 10px;
+}
