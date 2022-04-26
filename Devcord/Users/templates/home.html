@@ -1,0 +1,30 @@
+<datalist id="users">
+    {% for user in users%}
+    <option value={{user.username}}>
+    {% endfor%}
+  </datalist>
+  <form action="{%url 'search'%}" method="post">
+    {%csrf_token%}
+    <input type="text" list="users" name="res"> Search For Users<br>
+    <button type="submit">Search</button>
+  </form>
+
+<a href="{%url 'logout'%}">Logout</a>
+
+<table>
+  <tr>
+<th>No.</th>
+<th>Requests</th>
+</tr>
+<tr>
+{% for result in requests %}
+<tr>
+<td>{{forloop.counter}}</td>
+<td>{{result.username}}</td>
+  <form action="{%url 'accept' result.username%}" method='post'>
+{%csrf_token%}
+<td><button type="submit">Accept</button></td>
+      </form>
+</tr>
+{%endfor%}
+</table>

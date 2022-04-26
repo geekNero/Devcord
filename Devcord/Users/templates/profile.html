@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+</head>
+<body>
+    <!-- profile pic -->
+    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Profile Picture">
+    <!-- profile info -->
+    <h1>Profile - ID: {{user.id}}</h1>
+    <p>Username: {{user.username}}</p>
+    <p>Email: {{user.email}}</p>
+    {% if friend == "Send Request" %}
+    <form action="{%url 'friend_request' user.username%}" method="post">
+        {%csrf_token%}
+        <button type="submit">{{friend}}</button>
+    </form>
+    {% elif friend == "Remove Friend"%}
+    <form action="{%url 'remove' user.username%}" method="post">
+        {%csrf_token%}
+        <button type="submit">{{friend}}</button>
+    </form>
+    {% elif friend == "Cancel Request"%}
+    <form action="{%url 'cancel' user.username%}" method="post">
+        {%csrf_token%}
+        <button type="submit">{{friend}}</button>
+    </form>
+    {%endif%}
+    <!-- statistics -->
+    <h2>Statistics</h2>
+    <div class="graphs">
+        <div class="graph">
+            <h3>Posts</h3>
+            <div class="bar">
+                <div class="fill" style="width: 50%"></div>
+            </div>
+            <p>50%</p>
+        </div>
+        <div class="graph">
+            <h3>Likes</h3>
+            <div class="bar">
+                <div class="fill" style="width: 30%"></div>
+            </div>
+            <p>30%</p>
+        </div>
+        <div class="graph">
+            <h3>Comments</h3>
+            <div class="bar">
+                <div class="fill" style="width: 10%"></div>
+            </div>
+            <p>10%</p>
+        </div>
+    </div>
+</body>
+</html>
