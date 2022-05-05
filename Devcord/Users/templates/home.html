@@ -1,14 +1,18 @@
 <datalist id="users">
     {% for user in users%}
-    <option value={{user.username}}>
+    <option value={{user.username}} onclick="myFunction()">
     {% endfor%}
   </datalist>
   <form action="{%url 'search'%}" method="post">
     {%csrf_token%}
     <input type="text" list="users" name="res"> Search For Users<br>
-    <button type="submit">Search</button>
+    <button id= "demo" type="submit">Search</button>
   </form>
-
+  <script>
+    function myFunction() {
+      document.getElementById("demo").style.color = "red";
+    }
+    </script>
 <a href="{%url 'logout'%}">Logout</a>
 
 <table>
@@ -28,3 +32,20 @@
 </tr>
 {%endfor%}
 </table>
+
+Active Friends
+<table>
+  <tr>
+    <th>Sr.NO</th>
+    <th>Username</th>
+    <th>Software</th>
+    <th>Domain</th>
+  </tr>
+  {% for result in data %}
+  <tr>
+    <td>{{forloop.counter}}</td>
+    <td>{{friends.user.username}}</td>
+    <td>{{friends.total_score}}</td>
+    <td>{{friends.ques1}}</td>
+  </tr>
+  {% endfor%}

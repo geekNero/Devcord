@@ -9,5 +9,12 @@
     {{ login_form|crispy }}
     <button class="btn btn-primary" type="submit">Login</button>
   </form>
+  {% if messages %}
+  <ul>
+      {% for message in messages %}
+         <li style="color:rgb(15, 12, 12);">{{ message }}</li>
+      {% endfor %}
+  </ul>
+  {% endif %}
   <p class="text-center">Don't have an account? <a href="/register">Create an account</a>.</p>
 </div>

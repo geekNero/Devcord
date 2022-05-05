@@ -9,27 +9,31 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from .models import *
+import datetime
 def login(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                print(user)
-                auth_login(request, user)
-                messages.info(request, f"You are now logged in as {username}.")
-                try:
-                    nw=Player(user=user,friends="")
-                    nw.save()
-                except:
-                    pass
-                return redirect("home")
+        if(request.user.is_authenticated):
+            return redirect("home")
+        else:
+            form = AuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                username = form.cleaned_data.get('username')
+                password = form.cleaned_data.get('password')
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    print(user)
+                    auth_login(request, user)
+                    messages.info(request, f"You are now logged in as {username}.")
+                    try:
+                        nw=Player(user=user,friends="")
+                        nw.save()
+                    except:
+                        pass
+                    return redirect("selector")
+                else:
+                    messages.error(request,"Invalid username or password.")
             else:
                 messages.error(request,"Invalid username or password.")
-        else:
-            messages.error(request,"Invalid username or password.")
     form = AuthenticationForm()
     return render(request=request, template_name="login.html", context={"login_form":form})
 # Create your views here.
@@ -55,9 +59,19 @@ def home(request):
         a=int(s)
         if(a!=0):
             arr.append(User.objects.get(id=a))
-    return render(request,'home.html',{"users":obs,"requests":arr})
+    friends=[]
+    friends_code=player.friends
+    for i in range(0,len(friends_code),5):
+        s=req[i:i+5]
+        a=int(s)
+        if(a!=0 and User.objects.get(id=a).is_authenticated()):
+            friends.append(Player.objects.get(user=User.objects.get(id=a)))
+    return render(request,'home.html',{"users":obs,"requests":arr,"friends":friends})
 @login_required
 def logout_view(request):
+    nw=Player.objects.get(user=request.user)
+    nw.logout_time=datetime.datetime.now()
+    nw.save()
     logout(request)
     return render(request,'logout.html',{'users':"HeLLO"})
 @login_required
@@ -65,6 +79,7 @@ def search(request):
     if(request.method=="POST"):
         res=request.POST['res']
         return redirect('profile',res)
+@login_required
 def remove(request,username):
     a=Player.objects.get(user=request.user)
     valar=User.objects.get(username=username)
@@ -91,6 +106,7 @@ def remove(request,username):
     b.friends=sr
     b.save()
     return redirect('profile',username)
+@login_required
 def accept(request,username):
     valar=User.objects.get(username=username)
     a=Player.objects.get(user=valar)
@@ -124,6 +140,7 @@ def accept(request,username):
     b.requests=str1
     b.save()
     return redirect('profile',username)
+@login_required
 def cancel_request(request,username):
     print('In Cancel Request')
     valar=User.objects.get(username=username)
@@ -141,6 +158,7 @@ def cancel_request(request,username):
     a.requests=str1
     a.save()
     return redirect('profile',username)
+@login_required
 def add_friend(request,username):
     print(request.user,username )
     valar=User.objects.get(username=username)
@@ -153,8 +171,12 @@ def add_friend(request,username):
     a.requests=f
     a.save()
     return redirect('profile',username)
+@login_required
 def profile(request,username):
-    valar=User.objects.get(username=username)
+    try:
+        valar=User.objects.get(username=username)
+    except:
+        return render(request, 'user_does_not_exist.html')
     if(request.user.username!=valar.username):
         a=Player.objects.get(user=valar)
         s=""
@@ -188,3 +210,18 @@ def profile(request,username):
         return render(request,'profile.html',{'user':valar,'friend':s})
     else:
         return render(request,'profile.html',{'user':valar})
+# @login_required
+# def session(request):
+#     pass
+@login_required
+def selector(request):
+    software=list(Software.objects.all())
+    dict={}
+    for soft in software:
+        dict[soft]=list(Domain.objects.filter(software=soft))
+    dict=[dict]
+    print(dict[0])
+
+    return render(request,'session.html',{"software":software,"dict":dict,"length":len(software)})
+
+
