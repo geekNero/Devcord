@@ -9,9 +9,9 @@ Please Select your software:
 </style>
 <form >
     <label for="softwares">Choose software:</label>
-    <select name="software" id="softwares">
+    <select name="software" id="softwares" onchange=myFunction()>
         {%for soft in software%}
-      <option value="{{soft.executable}}" onclick="myFunction()">{{soft.name}}</option>
+      <option value="{{soft.executable}}" >{{soft.name}}</option>
       {%endfor %}
     </select>
     {%for di in dict%}
@@ -27,33 +27,28 @@ Please Select your software:
         <label for="domain">Choose Domain:</label>
         <select name="domain" id="domain"> 
             {%for dom in domain%}
-          <option value="{{dom.name}}" onclick="myFunction()">{{dom.name}}</option>
+          <option value="{{dom.name}}" >{{dom.name}}</option>
           {%endfor %}
         </select>
     </div>
-    <textarea id="{{forloop.counter}}">
-{{soft.executable}}
-    </textarea>
 {% endfor %}{% endfor %}
 </form>
 <div id="length">{{length}}</div>
 <script>
+    // myFunction();
+    localStorage.setItem("prev", "");
+
     function myFunction() {
-        console.log(document.getElementById("softwares").value);
+        // console.log(document.getElementById("softwares").value);
         const a=document.getElementById("softwares").value;
-        console.log(a);
-        const b=parseInt(document.getElementById("length").textContent);
-        console.log(b); 
-        const z=document.getElementById('0').value;
-        console.log(z);
-        for(let i=0;i<b;i++){
-            let c=document.getElementById(`${i}`).value;
-            console.log(c);
-            document.getElementById(`${c}`).classList.remove('show');
-        }
-        // document.getElementsByClassName("optionopop").classList.remove('show');
+        // console.log(a);
         document.getElementById(`${a}`).classList.add('show');
-
-
+        const b=localStorage.getItem("prev");
+        // console.log(b);
+        // console.log(document.getElementById(`${b}`));
+        if(b!=''){
+        document.getElementById(`${b}`).classList.remove('show');
+        }
+        localStorage.setItem("prev", `${a}`);
     }
     </script>  
