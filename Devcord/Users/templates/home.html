@@ -1,20 +1,20 @@
+{%if bool == True%}
+Inactive
+{% else %}
+Time Active: {{hours}}h {{minutes}}
+{% endif %}
 <datalist id="users">
     {% for user in users%}
-    <option value={{user.username}} onclick="myFunction()">
+    <option value={{user.username}} ">
     {% endfor%}
   </datalist>
   <form action="{%url 'search'%}" method="post">
     {%csrf_token%}
     <input type="text" list="users" name="res"> Search For Users<br>
     <button id= "demo" type="submit">Search</button>
-  </form>
-  <script>
-    function myFunction() {
-      document.getElementById("demo").style.color = "red";
-    }
-    </script>
-<a href="{%url 'logout'%}">Logout</a>
-
+  </form><br>
+<a href="{%url 'logout'%}"><button>Logout</button></a><br>
+<a href="{%url 'reinit'%}"><button>New Session</button></a><br>
 <table>
   <tr>
 <th>No.</th>
@@ -32,7 +32,7 @@
 </tr>
 {%endfor%}
 </table>
-
+<br> <br><br>
 Active Friends
 <table>
   <tr>
@@ -40,12 +40,26 @@ Active Friends
     <th>Username</th>
     <th>Software</th>
     <th>Domain</th>
+    <th>Time Active</th>
   </tr>
-  {% for result in data %}
+  {% for friend,domain,software,hour,minute,bol in myList %}
   <tr>
+    {% if bol == True%}
     <td>{{forloop.counter}}</td>
-    <td>{{friends.user.username}}</td>
-    <td>{{friends.total_score}}</td>
-    <td>{{friends.ques1}}</td>
+    <td>{{friend}}</td>
+    <td>Chilling</td>
+    <td></td>
+    <td></td>
+    {%else%}
+    <td>{{forloop.counter}}</td>
+    <td>{{friend}}</td>
+    <td>{{software.name}}</td>
+    <td>{{domain.name}}</td>
+    <td>{{hour}}h{{minute}}</td>
+    {%endif%}
   </tr>
   {% endfor%}
+  <!-- <script>
+    var home='127.0.0.1:8000/devcord/home'
+    window.location.replace(home);
+  </script> -->

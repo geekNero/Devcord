@@ -1,3 +1,4 @@
+# from tkinter import SE
 from django.shortcuts import  render, redirect
 from .forms import NewUserForm
 from django.contrib.auth import authenticate
@@ -10,6 +11,14 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from .models import *
 import datetime
+def inactive(user):
+    try:
+        a=Session.objects.get(player=Player.objects.get(user=user),active=True)
+        a.logout_time=datetime.datetime.now(datetime.timezone.utc)
+        a.active=False
+        a.save()
+    except:
+            pass
 def login(request):
     if request.method == "POST":
         if(request.user.is_authenticated):
@@ -53,6 +62,25 @@ def home(request):
     obs=User.objects.all()
     player=Player.objects.get(user=request.user)
     req=player.requests
+    bool=False
+    h=0
+    m=0
+    try:
+        a=Session.objects.get(player=Player.objects.get(user=request.user),active=True)
+        # print(a.login_time)
+        duration=datetime.datetime.now(datetime.timezone.utc)-a.login_time
+        # print(duration)
+        seconds = duration.total_seconds()
+        # print(seconds)
+        h = seconds // 3600
+        m = (seconds % 3600) // 60
+        seconds = seconds % 60
+        h=int(h)
+        m=int(m)
+        # print(hours, minutes)
+    except:
+        bool= True
+        print('NO Active Session')   
     arr=[]
     for i in range(0,len(req),5):
         s=req[i:i+5]
@@ -60,18 +88,52 @@ def home(request):
         if(a!=0):
             arr.append(User.objects.get(id=a))
     friends=[]
-    friends_code=player.friends
+    names=[]
+    friends_code=str(player.friends)
+    print(friends_code)
+    # print(s[5:])
     for i in range(0,len(friends_code),5):
-        s=req[i:i+5]
-        a=int(s)
-        if(a!=0 and User.objects.get(id=a).is_authenticated()):
-            friends.append(Player.objects.get(user=User.objects.get(id=a)))
-    return render(request,'home.html',{"users":obs,"requests":arr,"friends":friends})
+        # print(i)
+        s=friends_code[i:i+5]
+        # print(s)
+        if(s!=""):
+            a=int(s)
+            print(a)
+            if(a!=0 and (User.objects.get(id=a)).is_authenticated):
+                print((User.objects.get(id=a)).is_authenticated)
+                friends.append(Player.objects.get(user=User.objects.get(id=a)))
+                names.append(User.objects.get(id=a).username)
+    print(friends)
+    domain=[]
+    software=[]
+    time_hours=[]
+    time_minutes=[]
+    bol=[]
+    for i in friends:
+        try:
+            ar=Session.objects.get(player=i,active=True)
+            software.append(ar.software)
+            domain.append(ar.domain)
+            duration=datetime.datetime.now(datetime.timezone.utc)-ar.login_time
+            # print(duration)
+            seconds = duration.total_seconds()
+            # print(seconds)
+            hours = seconds // 3600
+            minutes = (seconds % 3600) // 60
+            time_hours.append(int(hours))
+            time_minutes.append(int(minutes))
+            bol.append(False)
+        except:
+            software.append('Inactive')
+            domain.append('Inactive')
+            time_hours.append(0)
+            time_minutes.append(0)
+            bol.append(True)
+    myList=zip(names,domain,software,time_hours,time_minutes,bol)
+    return render(request,'home.html',{"users":obs,"requests":arr,"myList":myList,"hours":h,"minutes":m,"bool":bool})
 @login_required
 def logout_view(request):
-    nw=Player.objects.get(user=request.user)
-    nw.logout_time=datetime.datetime.now()
-    nw.save()
+    inactive(request.user)
     logout(request)
     return render(request,'logout.html',{'users':"HeLLO"})
 @login_required
@@ -210,9 +272,28 @@ def profile(request,username):
         return render(request,'profile.html',{'user':valar,'friend':s})
     else:
         return render(request,'profile.html',{'user':valar})
-# @login_required
-# def session(request):
-#     pass
+@login_required
+def session(request):
+        if request.method == "POST":
+            try:
+                request.POST["spectate"]
+                inactive(request.user)
+            except:
+                try:
+                    Session.objects.get(player=Player.objects.get(user=request.user),active=True)
+                except:
+                    software=str(request.POST["software"])
+                    domain=str(request.POST["domain"+software])
+                    frameWork_or_platform="Django"
+                    session=Session(login_time=datetime.datetime.now(datetime.timezone.utc),
+                    logout_time=datetime.datetime.now(datetime.timezone.utc),
+                    domain=Domain.objects.get(name=domain),
+                    frameWork_or_platform=FrameWork_or_Platform.objects.get(name=frameWork_or_platform),
+                    software=Software.objects.get(executable=software),
+                    player=Player.objects.get(user=request.user),active=True)
+                    session.save()
+            return redirect("home")
+        return redirect("login")
 @login_required
 def selector(request):
     software=list(Software.objects.all())
@@ -221,7 +302,9 @@ def selector(request):
         dict[soft]=list(Domain.objects.filter(software=soft))
     dict=[dict]
     print(dict[0])
-
     return render(request,'session.html',{"software":software,"dict":dict,"length":len(software)})
 
-
+@login_required
+def reinit(request):
+    inactive(request.user)
+    return redirect("selector")

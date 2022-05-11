@@ -1,4 +1,19 @@
-Please Select your software:
+<!-- Please Select your software:
+<form action="{%url 'session'%}" method='post'>
+    {% csrf_token %}
+    <label for="softwares">Choose software:</label>
+    <select name="software" id="softwares">
+        {%for soft in software%}
+      <option value="{{soft.executable}}" onclick="myFunction()">{{soft.name}}</option>
+      {%endfor %}
+    </select>
+    <button type="submit">Start Session</button>
+    <br>
+    Just want to hangout? <button type="submit" name="spectate">Spectate</button>
+</form>
+
+ -->
+ Please Select your software:
 <style>
     .hidden{
         display:none;
@@ -7,53 +22,45 @@ Please Select your software:
         display:block;
     }
 </style>
-<form >
+<form action="{%url 'session'%}" method='post'>
+  {% csrf_token %}
     <label for="softwares">Choose software:</label>
-    <select name="software" id="softwares">
+    <select name="software" id="softwares" onchange=myFunction()>
         {%for soft in software%}
-      <option value="{{soft.executable}}" onclick="myFunction()">{{soft.name}}</option>
+      <option value="{{soft.executable}}" >{{soft.name}}</option>
       {%endfor %}
     </select>
-    {%for di in dict%}
-{% for soft, domain in di.items %}
-<h2>{{soft.executable}}</h2>
-{{domain}}
-{% endfor %}{% endfor %}
-
 {%for di in dict%}
 {% for soft, domain in di.items %}
-<h2>{{soft.executable}}</h2>
     <div  id="{{soft.executable}}" class="optionopop hidden">
         <label for="domain">Choose Domain:</label>
-        <select name="domain" id="domain"> 
+        <select name="domain{{soft.executable}}" id="domain"> 
             {%for dom in domain%}
-          <option value="{{dom.name}}" onclick="myFunction()">{{dom.name}}</option>
+          <option value="{{dom.name}}" >{{dom.name}}</option>
           {%endfor %}
         </select>
     </div>
-    <textarea id="{{forloop.counter}}">
-{{soft.executable}}
-    </textarea>
 {% endfor %}{% endfor %}
+<button type="submit">Start Session</button>
+<br>
+Just want to hangout? <button type="submit" name="spectate">Spectate</button>
 </form>
-<div id="length">{{length}}</div>
 <script>
+       
+    localStorage.setItem("prev", "");
+    myFunction();
     function myFunction() {
-        console.log(document.getElementById("softwares").value);
+              // console.log(document.getElementById("softwares").value);
         const a=document.getElementById("softwares").value;
         console.log(a);
-        const b=parseInt(document.getElementById("length").textContent);
-        console.log(b); 
-        const z=document.getElementById('0').value;
-        console.log(z);
-        for(let i=0;i<b;i++){
-            let c=document.getElementById(`${i}`).value;
-            console.log(c);
-            document.getElementById(`${c}`).classList.remove('show');
-        }
-        // document.getElementsByClassName("optionopop").classList.remove('show');
         document.getElementById(`${a}`).classList.add('show');
-
+        const b=localStorage.getItem("prev");
+        console.log(b);
+        // console.log(document.getElementById(`${b}`));
+        if(b.localeCompare("")!=0&&b.localeCompare(a)!=0){
+        document.getElementById(`${b}`).classList.remove('show');
+        }
+        localStorage.setItem("prev", `${a}`);
 
     }
     </script>  

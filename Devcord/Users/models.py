@@ -31,6 +31,7 @@ class Software(models.Model):
 class Domain(models.Model):
     name= models.CharField(max_length=1003, null=True)
     software=models.ManyToManyField(Software)
+    domain_short=models.CharField(max_length=1003,null=True)
     def __str__(self):
         return self.name
 class FrameWork_or_Platform(models.Model):
@@ -45,3 +46,4 @@ class Session(models.Model):
     software=models.ForeignKey(Software,null=True,on_delete=models.CASCADE)
     frameWork_or_platform=models.ForeignKey(FrameWork_or_Platform,null=True,on_delete=models.CASCADE)
     player=models.ForeignKey(Player,null=True,on_delete=models.CASCADE)
+    active=models.BooleanField(default=False)
